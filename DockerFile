@@ -1,0 +1,49 @@
+# --- STAGE 1: Build Environment ---
+FROM python:3.10-slim-bullseye AS base
+
+# Install necessary system packages
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    git && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set the working directory inside the container
+# This is the root of your project: RL-withMultiHumanFeedback
+WORKDIR /app
+
+# Copy the entire local repository contents into the container
+COPY ./RL-withMultiHumanFeedback /app
+
+# --- STAGE 2: Setup and Install Dependencies (using venv) ---
+
+# 1. Create a Python Virtual Environment
+# The venv will be named 'venv' as per your local setup
+RUN python3.10 -m venv venv
+
+# 2. Define the PATH to include the venv's executables for this stage
+# We use the full path to the venv's pip for the install command
+ENV PATH="/app/venv/bin:$PATH"
+
+# 3. Upgrade pip and install the project in editable mode
+# The '.' assumes the setup.py or pyproject.toml is in the current directory (/app)
+# This mimics your 'pip install -e .' command
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir -e .
+
+# --- STAGE 3: Runtime Configuration & Execution ---
+
+# **CRITICAL: For WandB Login**
+# The official way to log in non-interactively is via the WANDB_API_KEY environment variable.
+# When running this Docker image in a cloud service (HF Space or hf jobs), 
+# you MUST pass this variable to the container.
+
+# The command to run when the container starts.
+# It performs the WANDB login and then executes your parallel bash script.
+# CMD [ "/bin/bash", "-c", "wandb login && /app/run_parallel_training.sh" ]
+
+# NOTE on WANDB LOGIN:
+# The 'wandb login' command is non-interactive if WANDB_API_KEY is set 
+# in the environment where the container is launched.
+# If you run this on a service, you must configure a secret named WANDB_API_KEY
+# containing your actual WandB token.

@@ -1,0 +1,13 @@
+*.bin
+*.pt
+*.pth
+*.pkl
+*.h5
+*.ckpt
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+.env
+dist/
+build/

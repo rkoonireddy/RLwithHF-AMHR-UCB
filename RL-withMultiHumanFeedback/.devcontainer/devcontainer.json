@@ -1,0 +1,36 @@
+{
+  "name": "RL with Multi Human Feedback",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": ".."
+  },
+  "remoteUser": "root",
+  "workspaceFolder": "/app",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "username": "root"
+    },
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.10"
+    }
+  },
+  "settings": {
+    "python.defaultInterpreterPath": "/usr/local/bin/python",
+    "terminal.integrated.shell.linux": "/bin/zsh",
+    "python.analysis.autoImportCompletions": true,
+    "python.formatting.provider": "black"
+  },
+  "postCreateCommand": "pip install --upgrade pip setuptools wheel && pip install -e .",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter",
+        "ms-python.black-formatter"
+      ]
+    }
+  },
+  "runArgs": ["--gpus", "all"]
+}
